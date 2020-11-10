@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.cpen321_wedo.Adapter.TaskAdapter;
-import com.example.cpen321_wedo.Models.Task;
+import com.example.cpen321_wedo.adapter.TaskAdapter;
+import com.example.cpen321_wedo.models.Task;
 import com.example.cpen321_wedo.R;
 
 import java.util.ArrayList;
@@ -20,7 +20,10 @@ import java.util.ArrayList;
 import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 public class TaskFragment extends Fragment {
-
+//<<<<<<< HEAD
+//=======
+//
+//>>>>>>> 5f7b67a229b3ec75749abfcbc9293d1321b2b59c
     private TaskAdapter taskAdapter;
 
     @Override

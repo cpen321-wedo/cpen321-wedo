@@ -15,7 +15,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.cpen321_wedo.Models.Task;
+import com.example.cpen321_wedo.models.Task;
 import com.example.cpen321_wedo.fragments.UserFragment;
 import com.example.cpen321_wedo.fragments.TaskFragment;
 import com.google.android.material.tabs.TabLayout;

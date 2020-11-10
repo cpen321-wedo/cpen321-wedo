@@ -1,56 +1,49 @@
 CREATE TABLE User (
-	userID				char(50),
+	userID				int,
 	isPremium			boolean DEFAULT false,
-	token               char(170),
-	preferences			TEXT,
+	userName            char(100) NOT NULL,
+	password            char(100) NOT NULL,
+	token               char(250),
 	PRIMARY KEY (userID)
-);
+)
 
 CREATE TABLE TaskListWithOwner (
-	taskListID 			char(150),
-	userID				char(50) NOT NULL,
+	taskListID 			int,
 	taskListName 		char(100),
-	modifiedTime	 	datetime,
-	createdTime			datetime,
-	taskListDescription TEXT,
+	lastModifiedTime 	datetime,
+	timeCreated 		datetime,
+	chatID				int NOT NULL,
+	userID				int NOT NULL,
+	userCap				int NOT NULL,
 	PRIMARY KEY (taskListID),
 	UNIQUE (userID),
+	UNIQUE (chatID),
 	FOREIGN KEY (userID) REFERENCES User(userID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
-);
+)
 
 CREATE TABLE TaskHasTaskList (
-	taskID				char(200),
-	createdBy			char(50),
+	taskID				int,
+	chatID				int NOT NULL,
 	taskBudget			int,
 	taskDescription		TEXT,
-	taskType			char(50),
-	priorityLevel		int NOT NULL DEFAULT 0, 
 	address				TEXT,
-	done				boolean,
-	assignedTo			char(50),
-	taskRating			int,
-	createdTime			datetime,
-	modifiedTime	datetime,
 	taskName  			char(100),
-	taskListID			char(150) NOT NULL,
+	taskListID			int NOT NULL,
 	UNIQUE				(taskListID),
+	UNIQUE				(chatID),
 	PRIMARY KEY 		(taskID),
 	FOREIGN KEY (taskListID) REFERENCES TaskListWithOwner(taskListID)
 		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	FOREIGN KEY (createdBy) REFERENCES User(userID)
-		ON DELETE SET NULL
-		ON UPDATE CASCADE,
-	FOREIGN KEY (assignedTo) REFERENCES User(userID)
-		ON DELETE SET NULL
 		ON UPDATE CASCADE
-);
+)
+
+
 
 CREATE TABLE HasAccess (
-	userID				char(50),
-	taskListID			char(150),
+	userID				int,
+	taskListID			int,
 	PRIMARY KEY (userID, taskListID),
 	FOREIGN KEY (userID) REFERENCES User(userID)
 		ON DELETE CASCADE
@@ -58,29 +51,4 @@ CREATE TABLE HasAccess (
 	FOREIGN KEY (taskListID) REFERENCES TaskListWithOwner(taskListID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
-);
-
-CREATE TABLE UserPreferences (
-	userID				char(50) NOT NULL,
-	shopping			int DEFAULT 0,
-	transport			int DEFAULT 0,
-	eventSetup			int DEFAULT 0,
-	mechanical			int DEFAULT 0,
-	writing				int DEFAULT 0,
-	PRIMARY KEY 		(userID),
-	FOREIGN KEY (userID) REFERENCES User(userID)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
-);
-
--- CREATE TABLE Starred (
--- 	userID				char(50),
--- 	taskID				char(200),
--- 	PRIMARY KEY (userID, taskID),
--- 	FOREIGN KEY (userID) REFERENCES User(userID)
--- 		ON DELETE CASCADE
--- 		ON UPDATE CASCADE,
--- 	FOREIGN KEY (taskID) REFERENCES TaskHasTaskList(taskID)
--- 		ON DELETE CASCADE
--- 		ON UPDATE CASCADE
--- );
+)

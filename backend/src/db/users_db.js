@@ -1,35 +1,14 @@
-const database = require('./databaseInterface');
+const database = require('./databaseInterface')
 
 var userFunctions = {
-    checkPermission: function (userID, taskListID, callback) {
-        database.get('taskListID', 'HasAccess', 'userID = ' + userID + ", taskListID = " + taskListID, (err, results) => {
-            callback(err, results);
-        })
-    },
-    isListOwner: function (userID, taskListID, callback) {
-        database.get('taskListID', 'taskListWithOwner', 'userID = ' + userID + ", taskListID = " + taskListID, (err, results) => {
-            callback(err, results);
-        })
-    },
-    updateToken: function (userID, token, callback) {
-
-        database.update("User", "token = " + token, "userID = " + userID, (err, results) => {
-            callback(err, results);
-        })
-    },
-    updatePremium: function (userID, premiumStatus, callback) {
-        database.update("User", "isPremium = " + premiumStatus, "userID = " + userID, (err, results) => {
-            callback(err, results);
+    updateToken: function (entry, callback) {
+        database.update("User", entry, "userID = " + entry.userID.toString(), (err, result) => {
+            callback(err, result);
         })
     },
     getUserLists: function (userID, callback) {
-        database.get('taskListID', 'HasAccess', 'userID = ' + userID, (err, results) => {
-            callback(err, results);
-        })
-    },
-    registerUser: function (entry, callback) {
-        database.insert("User", entry, (err, results) => {
-            callback(err, results);
+        database.get('taskListID', 'HasAccess', 'userID = ' + userID.toString(), (err, lists) => {
+            callback(err, lists);
         })
     }
 }

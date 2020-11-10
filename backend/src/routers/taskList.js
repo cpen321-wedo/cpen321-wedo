@@ -1,147 +1,91 @@
-const express = require('express');
-const router = new express.Router();
-const taskListFunctions = require('../db/taskLists_db');
-const userFunctions = require('../db/users_db')
-const routerHelper = require('./routerHelper');
+const express = require('express')
+const router = new express.Router()
+const connection = require('../db/mysql')
+const auth = require('../auth/auth')
 
+// do not include userID in the task pls.
+router.post('/taskList', auth, (req, res)=>{
+    const taskList = req.body
 
-// Get all tasks (and its information) inside a task list
-router.get('/tasklist/get/:userID/:taskListID', (req, res) => {
+    taskList["userID"] = req.user.userID
+    connection.query('INSERT INTO TaskListWithOwner SET ?', taskList, (err,taskList)=>{
+        if(err) return console.log(err) 
 
-    console.log("getting tasks from tasklist");
+        const hasAccess = {userID: req.body.userID, taskListID: req.body.taskListID}
+        connection.query('INSERT INTO HasAccess SET ?', hasAccess, (err,result)=>{
+            if(err) return console.log(err) 
 
-    const userID = req.params.userID;
-    const taskListID = req.params.taskListID;
-
-    console.log("getting all tasks for user with ID: " + userID + "from tasklist with ID: " + taskListID);
-
-    if (typeof userID !== 'string' ||
-        typeof taskListID !== 'string')
-        res.status(400).send("bad data format or type");
-    else {
-
-        taskListFunctions.getTasksInList(taskListID, userID, (err, results, perms) => {
-            if (!perms)
-                res.status(401).send("user does not have permissions");
-            else {
-                routerHelper.callbackHandler(err, results);
-            }
-        });
-    }
-})
-
-// Save created task list onto database
-router.post('/tasklist/create', (req, res) => {
-
-    console.log("creating task list");
-
-    const newTaskList = req.body;
-
-    if (typeof newTaskList.userID !== 'string' ||
-        typeof newTaskList.taskListID !== 'string' ||
-        typeof newTaskList.taskListName !== 'string' ||
-        typeof newTaskList.createdTime !== 'string' ||
-        (typeof newTaskList.modifiedTime !== 'string' && newTaskList.modifiedTime != null) ||
-        (typeof newTaskList.taskListDescription !== 'string' && newTaskList.taskListDescription != null)) {
-        res.status(400).send("bad data format or type");
-    }
-    else {
-        taskListFunctions.createTaskList(newTaskList, (err, results) => {
-            routerHelper.callbackHandler(err, results);
-        });
-    }
-})
-
-// Update a task list
-router.put('/tasklist/update', (req, res) => {
-
-    console.log("updating tasklist");
-
-    const taskList = req.body;
-
-    if (typeof taskList.userID !== 'string' ||
-        typeof taskList.taskListID !== 'string' ||
-        typeof taskList.modifiedTime !== 'string' ||
-        (typeof taskList.taskListName !== 'string' && taskList.taskListName != null) ||
-        (typeof taskList.newOwner !== 'string' && taskList.newOwner != null))
-        res.status(400).send("bad data format or type");
-    else {
-        taskListFunctions.updateTaskList(taskList, (err, results, perms) => {
-            if (!perms)
-                res.status(401).send("user does not have permissions");
-            else {
-                routerHelper.callbackHandler(err, results);
-            }
+            res.status(201).send(result)
         })
-    }
+    })
 
+    
 })
 
-// Grant a user access to the task list + push notifications to users with access
-router.post('/tasklist/adduser', (req, res) => {
+router.get('/taskList', auth, (req, res)=>{
+    connection.query('SELECT * FROM TaskListWithOwner WHERE userID = ?', req.user.userID, (err, taskList)=>{
+        if(err) return res.status(500).send(err)
+        console.log('Successfully get user information')
+        res.send(taskList)
+    })
+})
 
-    console.log("adding user to task list");
+// delte this later
+router.get('/taskList/admin', (req, res)=>{
+    connection.query('SELECT * FROM TaskListWithOwner', (err, taskList)=>{
+        if(err) return res.status(500).send(err)
+        console.log('Successfully get user information')
+        res.send(taskList)
+    })
+})
 
-    const entry = req.body;
+// delete this later
+router.get('/taskList/:id', (req, res)=>{
+    const _id = req.params.id
+    connection.query('SELECT * FROM TaskListWithOwner WHERE taskListID = ?',_id, (err, taskList)=>{
+        if(err || !result) return res.status(500).send(err)
+        console.log('Successfully specific user id information')
+        res.send(taskList)
+    })
+})
 
-    if (typeof entry.userID !== 'string' ||
-        typeof entry.taskListID !== 'string' ||
-        typeof entry.addUser !== 'string')
-        res.status(400).send("bad data format or type");
-    else {
-        taskListFunctions.addUser(entry.userID, entry.taskListID, entry.addUser, (err, results, perms) => {
-            if (!perms)
-                res.status(401).send("user does not have permissions");
-            else {
-                routerHelper.callbackHandler(err, results);
+router.put("/taskList/:id", auth, (req, res)=>{
+
+    const _id = req.params.id
+    const obj = req.body
+
+    connection.query('SELECT * FROM HasAccess WHERE taskListID = ? AND userID = ?', [_id,req.user.userID], (err, hasAccess)=>{
+        if(err || !result) return res.status(500).send('Cannot modify taskList because that\'s not belongs to you ')
+
+        connection.query('UPDATE TaskListWithOwner SET ? WHERE taskListID = ?',[obj,_id], (err,result)=>{
+            if(err){
+                console.log(err)
+                return res.send(err)
             }
+            console.log('Successfully update user information')
+            res.send(result)
         })
-    }
+        
+    })
+    
+    
 })
 
-// Remove a user's access to the task list + push notifications to user with access
-router.delete('tasklist/removeuser', (req, res) => {
+// change to only head user can delete later
+router.delete('/taskListsk/:id', auth, (req, res)=>{
 
-    console.log("removing user from task list");
-
-    const entry = req.body;
-
-    if (typeof entry.userID !== 'string' ||
-        typeof entry.taskListID !== 'string' ||
-        typeof entry.toKick !== 'string')
-        res.status(400).send("bad data format or type");
-    else {
-        taskListFunctions.removeUser(entry.userID, entry.taskListID, entry.toKick, (err, results, perms) => {
-            if (!perms)
-                res.status(401).send("user does not have permissions");
-            else {
-                routerHelper.callbackHandler(err, results);
-            }
+    const _id = req.params.id
+    
+    connection.query('SELECT * FROM HasAccess WHERE taskListID = ? AND userID = ?',[_id,req.user.userID], (err, taskList)=>{
+        if(err || !result) return res.status(500).send('Cannot modify taskList because that\'s not belongs to you ')
+        
+        connection.query('DELETE FROM TaskHasTaskList WHERE taskListID = ?', req.params.id, (err, result)=>{
+            if(err) return res.status(500).send()
+    
+            res.send('Successfully delete the taskList with id '+req.params.id)
         })
-    }
-})
+    })
 
-// Delete task list and sends push notification to all users with access
-router.delete('tasklist/delete', (req, res) => {
-
-    console.log("deleting task list");
-
-    const userID = req.body.userID;
-    const taskListID = req.body.taskListID;
-
-    if (typeof userID !== 'string' ||
-        typeof taskListID !== 'string')
-        res.status(401).send("bad data format or type");
-    else {
-        taskListFunctions.deleteTaskList(userID, taskListID, (err, results, perms) => {
-            if (!perms)
-                res.status(401).send("user does not have permissions");
-            else {
-                routerHelper.callbackHandler(err, results);
-            }
-        })
-    }
-})
+ })
 
 module.exports = router
-

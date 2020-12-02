@@ -7,6 +7,8 @@ public class Token {
         this.token = token;
     }
 
+
+
     public Token(){
 
     }

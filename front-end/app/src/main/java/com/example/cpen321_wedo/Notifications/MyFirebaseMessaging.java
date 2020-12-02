@@ -13,7 +13,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.example.cpen321_wedo.AcceptFriendsActivity;
+import com.example.cpen321_wedo.AcceptTaskListActivity;
 import com.example.cpen321_wedo.MessageActivity;
+import com.example.cpen321_wedo.TaskListActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -37,13 +40,20 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         if(firebaseUser != null) {
             assert sented != null;
             if (sented.equals(firebaseUser.getUid())) {
-                sendNotification(remoteMessage);
+
+                if(remoteMessage.getData().get("type").equals("MESSAGE")){
+                    sendNotification(remoteMessage, new Intent(this, MessageActivity.class));
+                }else if(remoteMessage.getData().get("type").equals("ADDFRIEND")){
+                    sendNotification(remoteMessage, new Intent(this, AcceptFriendsActivity.class));
+                }else if(remoteMessage.getData().get("type").equals("WORKTOGETHER")){
+                    sendNotification(remoteMessage, new Intent(this, AcceptTaskListActivity.class));
+                }
             }
         }
     }
 
 
-    private void sendNotification(RemoteMessage remoteMessage){
+    private void sendNotification(RemoteMessage remoteMessage, Intent intent){
         String user = remoteMessage.getData().get("user");
         String icon = remoteMessage.getData().get("icon");
         String title = remoteMessage.getData().get("title");
@@ -54,7 +64,6 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //        RemoteMessage.Notification notification = remoteMessage.getNotification();
         assert user != null;
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
-        Intent intent = new Intent(this, MessageActivity.class);
         Bundle bundle =new Bundle();
         bundle.putString("userid", user);
         intent.putExtras(bundle);
@@ -88,5 +97,4 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         notificationManager.notify(i, builder.build());
         Log.d("test", "send notification in firebase messaging service");
     }
-
 }

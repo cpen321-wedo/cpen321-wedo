@@ -1,18 +1,24 @@
 package com.example.cpen321_wedo.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cpen321_wedo.TaskDescriptionActivity;
 import com.example.cpen321_wedo.models.Task;
 import com.example.cpen321_wedo.R;
 
@@ -29,11 +35,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     private ArrayList<Task> tasks;
     private final ArrayList<Task> toDelete;
     private int currentView;
+    private int taskSelected;
+    private Menu menu;
+    private Context context;
 
-    public TaskAdapter() {
+    public TaskAdapter(Context context) {
         tasks = new ArrayList<>();
         currentView = TASK_ITEM;
         toDelete = new ArrayList<>();
+        taskSelected = 0;
+        this.context = context;
     }
 
     @NonNull
@@ -71,6 +82,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                     notifyItemChanged(position);
                 }
             });
+
+            holder.parent.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, TaskDescriptionActivity.class);
+                    intent.putExtra("title", tasks.get(position).getTaskName());
+                    intent.putExtra("taskType", tasks.get(position).getTaskType());
+                    intent.putExtra("taskDescription", tasks.get(position).getTaskDescription());
+                    intent.putExtra("taskLocation", tasks.get(position).getTaskLocation());
+                    ContextCompat.startActivity(context, intent, null);
+                }
+            });
         } else {
             if (tasks.get(position).isCompleted()) {
                 holder.taskName.setPaintFlags(holder.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -78,14 +102,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 holder.taskName.setPaintFlags(holder.taskName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             }
             holder.checkbox.setChecked(false);
+            menu.findItem(R.id.trash).setEnabled(false);
+
 
             holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
                         toDelete.add(tasks.get(position));
+                        taskSelected++;
                     } else {
                         toDelete.remove(tasks.get(position));
+                        taskSelected--;
+                    }
+
+                    if (taskSelected == 0) {
+                        menu.findItem(R.id.trash).setEnabled(false);
+                    } else {
+                        menu.findItem(R.id.trash).setEnabled(true);
                     }
                 }
             });
@@ -142,14 +176,25 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public ArrayList<Task> getDeleteTasks() {
+        return this.toDelete;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView taskName;
         private Button markDone;
         private CheckBox checkbox;
+        private RelativeLayout parent;
+
         public ViewHolder(@NonNull View itemView, int viewType) {
             super(itemView);
             taskName = itemView.findViewById(R.id.taskName);
+            parent = itemView.findViewById(R.id.taskParent);
             if (viewType == TASK_ITEM) {
                 markDone = itemView.findViewById(R.id.doneBtn);
             } else {

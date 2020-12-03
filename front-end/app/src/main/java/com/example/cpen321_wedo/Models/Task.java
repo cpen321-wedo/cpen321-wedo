@@ -11,7 +11,6 @@ public class Task {
     private boolean completed;
     private long dateCreatedInMilliSeconds;
     private long dateModifiedInMilliSeconds;
-    // useles comment
 
     public String getTaskLocation() {
         return taskLocation;

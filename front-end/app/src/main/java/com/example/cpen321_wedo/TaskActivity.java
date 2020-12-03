@@ -12,7 +12,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -123,6 +122,9 @@ public class TaskActivity extends AppCompatActivity {
             final String[] reply = data.getStringArrayExtra("task");
 
             postData(reply[0], reply[1], reply[2], reply[3]);
+        } else if (requestCode == 2 && resultCode == RESULT_OK) {
+            String[] taskUpdateReply = data.getStringArrayExtra("taskUpdate");
+
         }
     }
 

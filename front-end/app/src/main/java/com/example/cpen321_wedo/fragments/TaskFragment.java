@@ -1,6 +1,5 @@
 package com.example.cpen321_wedo.fragments;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -22,11 +21,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.cpen321_wedo.TaskActivity;
 import com.example.cpen321_wedo.adapter.TaskAdapter;
 import com.example.cpen321_wedo.models.Task;
 import com.example.cpen321_wedo.R;
-import com.example.cpen321_wedo.models.TaskList;
 import com.example.cpen321_wedo.singleton.RequestQueueSingleton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -72,7 +69,7 @@ public class TaskFragment extends Fragment {
 
         getData();
 
-        taskAdapter = new TaskAdapter(getContext());
+        taskAdapter = new TaskAdapter(getContext(), getActivity());
         taskAdapter.setTasks(tasks);
 
         taskRecyclerView.setAdapter(taskAdapter);
@@ -82,6 +79,10 @@ public class TaskFragment extends Fragment {
 
     public void addTask(Task task) {
         taskAdapter.addTask(task);
+    }
+
+    public void updateTask(String taskName, String taskType, String taskDescription, String taskLocation, int position) {
+        task
     }
 
     public void toggleItemViewType () { taskAdapter.toggleItemViewType(); }

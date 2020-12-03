@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
-import static java.sql.Types.NULL;
 
 public class TaskFragment extends Fragment {
 
@@ -80,9 +79,9 @@ public class TaskFragment extends Fragment {
     public void addTask(Task task) {
         taskAdapter.addTask(task);
     }
-
+    
     public void updateTask(String taskName, String taskType, String taskDescription, String taskLocation, int position) {
-        task
+        taskAdapter.updateTask(taskName, taskType, taskDescription, taskLocation, position);
     }
 
     public void toggleItemViewType () { taskAdapter.toggleItemViewType(); }

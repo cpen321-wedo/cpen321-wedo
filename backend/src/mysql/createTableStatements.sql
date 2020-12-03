@@ -14,7 +14,6 @@ CREATE TABLE TaskListWithOwner (
 	createdTime			datetime,
 	taskListDescription TEXT,
 	PRIMARY KEY (taskListID),
-	UNIQUE (userID),
 	FOREIGN KEY (userID) REFERENCES Users(userID)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
@@ -35,7 +34,6 @@ CREATE TABLE TaskHasTaskList (
 	modifiedTime	datetime,
 	taskName  			char(100),
 	taskListID			char(150) NOT NULL,
-	UNIQUE				(taskListID),
 	PRIMARY KEY 		(taskID),
 	FOREIGN KEY (taskListID) REFERENCES TaskListWithOwner(taskListID)
 		ON DELETE CASCADE

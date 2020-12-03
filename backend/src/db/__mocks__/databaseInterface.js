@@ -1,19 +1,9 @@
-const database = jest.createMockFromModule("../databaseInterface");
-function get(attributesToGet, table, condition, callback) {
-    callback("",
-        [{ "taskListID": 1 },
-        { "taskListID": 2 },
-        { "taskListID": 8 },
-        { "taskListID": 200 }]);
-}
-
-// jest.mock("../databaseInterface", () => ({
-//     get: (attributesToGet, table, condition, callback) => callback("", [
-//         { "taskListID": 1 },
-//         { "taskListID": 2 },
-//         { "taskListID": 8 },
-//         { "taskListID": 200 }])
-// })
-
-database.get = get;
+/* global jest */
+var database = {
+    get: jest.fn((attributesToGet, table, condition, additional, callback) => { }),
+    update: jest.fn((table, values, condition, callback) => { }),
+    delete: jest.fn((table, condition, callback) => { }),
+    insert: jest.fn((table, entry, callback) => { }),
+    getJoin: jest.fn((attributesToGet, table0, table1, joinCond, callback) => { })
+};
 module.exports = database;

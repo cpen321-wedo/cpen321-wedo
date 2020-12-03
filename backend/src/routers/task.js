@@ -14,7 +14,7 @@ const routerHelper = require("./routerHelper");
 //
 // Optional attributes: ***************************************************
 // typeof body.taskDescription == "string"
-// typeof body.budget == "number"
+// typeof body.taskBudget == "number"
 // typeof body.address == "string"
 // typeof body.priorityLevel == "number"
 // typeof body.modifiedTime == "string"
@@ -32,17 +32,18 @@ router.post("/task/create", (req, res) => {
 // typeof body.userID == "string"
 // typeof body.taskID == "string"
 // typeof body.taskListID == "string"
+//
+// Optional attributes: **************************************************
 // typeof body.taskName == "string"
 // typeof body.taskType == "string"
-// typeof body.createdTime == "string"
-//
-// Optional attributes: ***************************************************
 // typeof body.taskDescription == "string"
 // typeof body.assignedTo == "string"
 // typeof body.budget == "number"
 // typeof body.address == "string"
 // typeof body.priorityLevel == "number"
 // typeof body.modifiedTime == "string"
+// typeof body.done == "boolean"
+// typeof body.taskRating == "number" (IMPORTANT: THIS MUST BE DEFINED IF DONE IS DEFINED)
 router.put("/task/update", (req, res) => {
     const task = req.body;
 
